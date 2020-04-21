@@ -4,6 +4,7 @@ import os, json, nltk
 
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+from gensim.models import LdaMulticore
 
 def extract_simple_docs(df):
     docs = []
@@ -40,5 +41,31 @@ def simple_preprocess(docs):
     return new_docs
 
 def make_lda(dictionary, corpus, num_topics):
+    passes = 10
+
+    # Make a index to word dictionary.
+    temp = dictionary[0]  # This is only to "load" the dictionary.
+    id2word = dictionary.id2token
+
+    model = LdaMulticore(
+        corpus=corpus,
+        id2word=id2word,
+        passes=passes,
+        num_topics=num_topics
+    )
     
+    return model
+
+def get_model_stats(model, docs, dictionary, num_topics, verbose=False):
+    top_topics = model.top_topics(texts=docs, dictionary=dictionary, coherence='c_v') #, num_words=20)
+
+    # Average topic coherence is the sum of topic coherences of all topics, divided by the number of topics.
+    avg_topic_coherence = sum([t[1] for t in top_topics]) / num_topics
+    rstd_atc = np.std([t[1] for t in top_topics]) / avg_topic_coherence
+  
+    if verbose:
+        print('Average topic coherence: ', avg_topic_coherence)
+        print('Relative Standard Deviation of ATC: ', rstd_atc)
+        
+    return avg_topic_coherence, rstd_atc
     
