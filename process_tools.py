@@ -1,10 +1,15 @@
 import pandas as pd
 import numpy as np
-import os, json, nltk
+import os, json, nltk, time, datetime
 
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from gensim.models import LdaMulticore
+
+def get_current_timestamp():
+    timestamp = int(time.time())
+    date = datetime.datetime.fromtimestamp(timestamp)
+    return date.strftime('%Y-%m-%d %H:%M:%S')
 
 def extract_simple_docs(df):
     docs = []
@@ -68,4 +73,11 @@ def get_model_stats(model, docs, dictionary, num_topics, verbose=False):
         print('Relative Standard Deviation of ATC: ', rstd_atc)
         
     return avg_topic_coherence, rstd_atc
+
+def add_model_row(models_df, model_type, num_topics, abs_or_full, top_n_grams, hyperparam_dict, avg_topic_coherence, rstd_atc):
+    model_name = model_type + "_" + str(num_topics) + "_" + get_current_timestamp()
     
+    models_df = models_df.append({'model_name':model_name, 'model_type':model_type, 'num_topics':num_topics, 'abs_or_full':abs_or_full,
+                      'top_n_grams':top_n_grams, 'hyperparam_dict': hyperparam_dict, 
+                      'avg_topic_coherence':avg_topic_coherence, 'rstd_atc':rstd_atc}, ignore_index=True)
+    return models_df
