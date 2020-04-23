@@ -24,6 +24,19 @@ def extract_simple_docs(df):
     
     return docs
 
+def extract_full_docs(df):
+    docs = []
+    for row in df.iterrows():
+        body = row[1]['full_body_text']
+        abstract = row[1]['abstract']
+        title = row[1]['title']
+        if len(title) < 20:
+            title = ''
+        doc = title + ' ' + abstract + ' ' + body
+        docs.append(doc)
+    
+    return docs
+
 def get_stopwords():
     languages = ['english', 'spanish', 'french']
     stop_words = []
