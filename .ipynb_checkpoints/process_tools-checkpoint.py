@@ -92,7 +92,7 @@ def make_nmf(dictionary, corpus, num_topics):
     
     return model
 
-def get_model_stats(model, model_type, docs, dictionary, corpus, num_topics, verbose=False):
+def get_model_stats(model, model_type, docs, dictionary, corpus, num_topics, verbose=False, get_topics=False):
     if model_type == 'lda':
         top_topics = model.top_topics(texts=docs, dictionary=dictionary, coherence='c_v') #, num_words=20)
     elif model_type == 'nmf':
@@ -105,7 +105,10 @@ def get_model_stats(model, model_type, docs, dictionary, corpus, num_topics, ver
     if verbose:
         print('Average topic coherence: ', avg_topic_coherence)
         print('Relative Standard Deviation of ATC: ', rstd_atc)
-        
+    
+    if get_topics:
+        return avg_topic_coherence, rstd_atc, top_topics
+    
     return avg_topic_coherence, rstd_atc
 
 def add_model_row(models_df, model_type, num_topics, abs_or_full, top_n_grams, hyperparam_dict, avg_topic_coherence, rstd_atc):
